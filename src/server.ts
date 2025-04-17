@@ -9,7 +9,12 @@ app.setErrorHandler((error, request, reply) => {
 });
 
 const start = async () => {
-  await app.register(cors);
+  await app.register(cors, {
+    origin: true, // Or specify your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  });
   await app.register(routes);
 
   try {
