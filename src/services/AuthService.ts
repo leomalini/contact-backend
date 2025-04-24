@@ -5,8 +5,7 @@ import jwt from "jsonwebtoken";
 const prisma = new PrismaClient();
 
 export class AuthService {
-  private static readonly JWT_SECRET =
-    process.env.JWT_SECRET || "your-secret-key";
+  private static readonly JWT_SECRET = process.env.JWT_SECRET as string;
   private static readonly SALT_ROUNDS = 10;
 
   async register(name: string, email: string, password: string) {
