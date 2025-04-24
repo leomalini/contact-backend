@@ -27,10 +27,9 @@ export async function authenticate(
       return reply.status(401).send({ error: "No token provided" });
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "your-secret-key"
-    ) as { userId: string };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      userId: string;
+    };
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
     });
