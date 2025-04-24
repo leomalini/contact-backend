@@ -1,14 +1,20 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { ListCustomerService } from "../services/ListCustomersService";
+import { FastifyRequest, FastifyReply } from "fastify";
+import { PrismaClient } from "@prisma/client";
 
-class ListCustomerController {
+const prisma = new PrismaClient();
+
+export class ListCustomersController {
   async handle(request: FastifyRequest, reply: FastifyReply) {
-    const listCustomerService = new ListCustomerService();
+    try {
+      const customers = await prisma.customer.findMany({
+        where: {
+          userId: request.user.id,
+        },
+      });
 
-    const customers = await listCustomerService.execute();
-
-    reply.send(customers);
+      return reply.status(200).send(customers);
+    } catch (error) {
+      return reply.status(400).send({ error: error });
+    }
   }
 }
-
-export { ListCustomerController };

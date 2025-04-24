@@ -5,8 +5,10 @@ import {
   FastifyReply,
 } from "fastify";
 import { CreateCustomerController } from "./controllers/CreateCustomerController";
-import { ListCustomerController } from "./controllers/ListCustomersController";
+import { ListCustomersController } from "./controllers/ListCustomersController";
 import { DeleteCustomerController } from "./controllers/DeleteCustomerController";
+import { AuthController } from "./controllers/AuthController";
+import { authenticate } from "./middleware/auth";
 
 export async function routes(
   fastify: FastifyInstance,
@@ -16,8 +18,25 @@ export async function routes(
     return { message: "Hello World!" };
   });
 
+  // Auth routes
+  fastify.post(
+    "/auth/register",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      return new AuthController().register(request, reply);
+    }
+  );
+
+  fastify.post(
+    "/auth/login",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      return new AuthController().login(request, reply);
+    }
+  );
+
+  // Protected Customer routes
   fastify.post(
     "/customer",
+    { preHandler: authenticate },
     async (request: FastifyRequest, reply: FastifyReply) => {
       return new CreateCustomerController().handle(request, reply);
     }
@@ -25,13 +44,15 @@ export async function routes(
 
   fastify.get(
     "/customers",
+    { preHandler: authenticate },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      return new ListCustomerController().handle(request, reply);
+      return new ListCustomersController().handle(request, reply);
     }
   );
 
   fastify.delete(
     "/customer",
+    { preHandler: authenticate },
     async (request: FastifyRequest, reply: FastifyReply) => {
       return new DeleteCustomerController().handle(request, reply);
     }

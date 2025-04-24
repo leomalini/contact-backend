@@ -16,10 +16,24 @@ datasource db {
 model Customer {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String
-  email     String    @unique
+  email     String
   status    Boolean
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
 
   @@map("customers")
+}
+
+model User {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime?  @updatedAt
+  customers Customer[]
+
+  @@map("users")
 }

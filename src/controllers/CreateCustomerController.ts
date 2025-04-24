@@ -1,16 +1,29 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { CreateCustomerService } from "../services/CreateCustomerService";
+import { FastifyRequest, FastifyReply } from "fastify";
+import { PrismaClient } from "@prisma/client";
 
-class CreateCustomerController {
+const prisma = new PrismaClient();
+
+export class CreateCustomerController {
   async handle(request: FastifyRequest, reply: FastifyReply) {
-    const { name, email } = request.body as { name: string; email: string };
+    try {
+      const { name, email, status } = request.body as {
+        name: string;
+        email: string;
+        status: boolean;
+      };
 
-    const customerService = new CreateCustomerService();
+      const customer = await prisma.customer.create({
+        data: {
+          name,
+          email,
+          status: true,
+          userId: request.user.id,
+        },
+      });
 
-    const customer = await customerService.execute({ email, name });
-
-    reply.send(customer);
+      return reply.status(201).send(customer);
+    } catch (error) {
+      return reply.status(400).send({ error: error });
+    }
   }
 }
-
-export { CreateCustomerController };
